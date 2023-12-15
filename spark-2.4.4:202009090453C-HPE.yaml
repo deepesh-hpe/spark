@@ -1,0 +1,68 @@
+apiVersion: "sparkoperator.hpe.com/v1beta2"
+kind: SparkApplication
+metadata:
+  name: npi-ingestion-test
+  namespace: dtsandbox
+  annotations:
+   sidecar.istio.io/inject: "false"
+spec:
+  sparkConf:
+    # Note: If you are executing the application as a K8 user that MapR can verify,
+    #       you do not need to specify a spark.mapr.user.secret
+    spark.mapr.user.secret: mapr-user-secret-1612342714
+    spark.executor.memoryOverhead: 2g
+    spark.driver.memoryOverhead: 2g
+    spark.cleaner.periodicGC.interval: 2m
+    spark.driver.maxResultSize: "0"
+    spark.sql.shuffle.partitions: "50"
+    spark.default.parallelism: "100"
+    spark.memory.offHeap.size: 2g
+    spark.shuffle.io.maxRetries: "10"
+    spark.sql.caseSensitive: "false"
+    #spark.shuffle.io.retryWait: "60s"
+    #spark.shuffle.io.serverThreads: "128"
+    #spark.shuffle.file.buffer: "1m"
+    spark.io.encryption.enabled: "false"
+    #spark.dynamicAllocation.enabled: "false"
+    #spark.shuffle.io.preferDirectBufs: "false"
+    spark.cleaner.referenceTracking.cleanCheckpoints: "true"
+    spark.network.crypto.enabled: "false"
+    #spark.io.compression.lz4.blockSize: 128kb
+    spark.sql.autoBroadcastJoinThreshold: "-1"
+    #spark.submit.deployMode: "cluster"
+    #spark.authenticate: "false"
+    spark.serializer: org.apache.spark.serializer.KryoSerializer
+    spark.kryoserializer.buffer: 64m
+    spark.kryoserializer.buffer.max: 1024m
+    spark.rpc.askTimeout: 360s
+    # Note: You do not need to specify a spark.eventLog.dir
+    #       it will be auto-generated with the pattern "maprfs:///apps/spark/<namespace>"
+    #spark.eventLog.dir: "maprfs:///apps/spark/sampletenant"  
+  type: Scala
+  sparkVersion: 2.4.4
+  mode: cluster
+  image: gcr.io/mapr-252711/spark-2.4.4:202009090453C
+  imagePullPolicy: Always
+  mainClass: Driver
+  mainApplicationFile: maprfs:///exthcp-c0371629/c0371629-tenant-34/fsmount/DE/NPI/jar/npi_ingestion_lab-1.0-SNAPSHOT.jar
+  restartPolicy:
+    type: Never 
+  arguments: ["prod"]
+  imagePullSecrets:
+    - imagepull
+  mode: cluster
+  driver:
+    cores: 1
+    coreLimit: "1000m"
+    memory: "2g"
+    labels:
+      version: 2.4.4
+  executor:
+    cores: 1
+    coreLimit: "1000m"
+    instances: 1
+    memory: "2g"
+    labels:
+      version: 2.4.4
+
+      
