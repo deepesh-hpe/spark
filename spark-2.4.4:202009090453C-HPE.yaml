@@ -57,6 +57,8 @@ spec:
     memory: "2g"
     labels:
       version: 2.4.4
+    annotations:
+      sidecar.istio.io/inject: "false"    
   executor:
     cores: 1
     coreLimit: "1000m"
@@ -64,5 +66,7 @@ spec:
     memory: "2g"
     labels:
       version: 2.4.4
+    annotations:
+      sidecar.istio.io/inject: "false"  
 
       
